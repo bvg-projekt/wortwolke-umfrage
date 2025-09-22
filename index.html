@@ -1,360 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Umfrage — Live Wortwolke</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Umfrage: Antwort eingeben</title>
 <style>
-  :root{
-    --accent:#2b6cb0;
-    --bg:#ffffff;
-    --text:#111111;
-    --card:#f7fafc;
-    --max-font:72;
-    --min-font:14;
-  }
-  *{box-sizing:border-box;font-family:Inter, Roboto, Arial, sans-serif}
-  body{margin:0;background:var(--bg);color:var(--text);display:flex;flex-direction:column;min-height:100vh}
-  header{display:flex;align-items:center;gap:16px;padding:12px 20px;background:linear-gradient(90deg,var(--accent), #4aa3d8);color:white}
-  header img.logo{height:48px;width:auto;border-radius:8px;background:white;padding:4px}
-  header h1{margin:0;font-size:1.1rem}
-  main{padding:20px;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
-  .card{background:var(--card);padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-  form textarea{width:100%;height:100px;padding:10px;border-radius:8px;border:1px solid #ddd;resize:vertical}
-  form button{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:8px;margin-top:8px;cursor:pointer}
-  #status{margin-top:8px;font-size:0.9rem;color:#2f855a}
-  #wordCloud{min-height:320px;padding:12px;border-radius:8px;background:linear-gradient(180deg,#fff,#f2f8ff);display:flex;flex-wrap:wrap;align-items:flex-start}
-  .tag{display:inline-block;margin:6px;padding:4px 6px;border-radius:6px;background:transparent;cursor:default}
-  .controls label{display:block;margin-top:8px;font-size:0.9rem}
-  .controls input[type="color"]{height:36px;width:56px;border:none;padding:0}
-  .controls input[type="text"]{width:100%;padding:6px;border-radius:6px;border:1px solid #ccc}
-  footer{padding:12px 20px;font-size:0.85rem;color:#444;margin-top:auto}
-  .small{font-size:0.85rem;color:#555}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .linkbtn{background:transparent;border:1px solid #bbb;padding:8px;border-radius:8px;cursor:pointer}
-  @media (max-width:900px){
-    main{grid-template-columns:1fr; padding:12px}
-  }
+  body{font-family:sans-serif;margin:0;padding:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#f5f5f5}
+  .card{background:white;padding:24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);width:90%;max-width:400px;text-align:center}
+  textarea{width:100%;height:100px;padding:10px;margin-bottom:12px;border-radius:8px;border:1px solid #ccc;resize:none}
+  button{background:#2b6cb0;color:white;padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
+  #status{margin-top:10px;color:#2f855a;font-size:0.9rem}
 </style>
 </head>
 <body>
-<header>
-  <img class="logo" id="logoImg" src="" alt="Logo" style="display:none"/>
-  <h1 id="title">Live-Wortwolke — scanne QR oder besuche die Seite</h1>
-</header>
+<div class="card">
+  <h2>Schreibe dein Wort</h2>
+  <textarea id="respText" placeholder="Hier eingeben..."></textarea>
+  <br>
+  <button id="sendBtn">Absenden</button>
+  <div id="status"></div>
+</div>
 
-<main>
-  <div class="card">
-    <h2>Antwort senden</h2>
-    <p class="small">Scanne den QR-Code oder nutze das Formular:</p>
-    <form id="respForm">
-      <textarea id="respText" placeholder="Deine Antwort (frei) — drücken auf Absenden"></textarea>
-      <div><button type="submit">Absenden</button></div>
-      <div id="status" aria-live="polite"></div>
-    </form>
-
-    <div style="margin-top:14px">
-      <h3 class="small">Einstellungen (nur für Organizer)</h3>
-      <div class="controls">
-        <label>Logo URL (öffentliche URL): <input id="logoUrl" type="text" placeholder="https://example.com/logo.png" /></label>
-        <label>Hintergrundfarbe: <input id="bgColor" type="color" value="#ffffff" /></label>
-        <label>Akzentfarbe: <input id="accentColor" type="color" value="#2b6cb0" /></label>
-        <label>Textfarbe: <input id="textColor" type="color" value="#111111" /></label>
-        <label><input id="usePhrases" type="checkbox" /> Ganze Antworten als Eintrag (nicht in einzelne Wörter zerlegen)</label>
-        <label><input id="removeStopwords" type="checkbox" checked /> Häufige Stopwörter entfernen (de/en)</label>
-        <div class="actions">
-          <button id="saveSettings" class="linkbtn" type="button">Übernehmen</button>
-          <button id="downloadCSV" class="linkbtn" type="button">Antworten als CSV</button>
-          <button id="embedCode" class="linkbtn" type="button">Embed-Code</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div>
-    <div class="card">
-      <h2>Wortwolke</h2>
-      <p class="small">Häufigere Wörter werden größer und dicker. Alle vorhandenene Items werden angezeigt.</p>
-      <div id="wordCloud" aria-live="polite"></div>
-    </div>
-
-    <div style="height:12px"></div>
-
-    <div class="card small">
-      <strong>Live-Updates:</strong> Neue Antworten erscheinen automatisch. <br />
-      <strong>Moderation:</strong> Löschen/Ändern von Antworten über die Firebase Console (wenn nötig).
-    </div>
-  </div>
-</main>
-
-<footer>
-  <span class="small">Erstellt mit GitHub Pages + Firebase — anpassbar (Farben, Logo, Anzeigeverhalten).</span>
-</footer>
-
-<!-- Firebase SDK (modular) -->
 <script type="module">
-  // --- 1) Firebase konfigurieren: ersetze die folgenden Werte mit deinen Firebase App Werten ---
-  const firebaseConfig = /* TODO: DEINE FIREBASE CONFIG HIER */ {
-    // Beispiel:
-    // apiKey: "AIza....",
-    // authDomain: "projekt.firebaseapp.com",
-    // projectId: "projekt",
-    // ...
-  };
-  // ------------------------------------------------------------------------------------------
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs
-  } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-  // init
+  const firebaseConfig = /* TODO: DEINE FIREBASE CONFIG */ {};
+
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  // DOM
-  const respForm = document.getElementById('respForm');
+  signInAnonymously(auth).catch(console.error);
+
+  const sendBtn = document.getElementById('sendBtn');
   const respText = document.getElementById('respText');
   const status = document.getElementById('status');
-  const wordCloud = document.getElementById('wordCloud');
-  const logoUrlInput = document.getElementById('logoUrl');
-  const logoImg = document.getElementById('logoImg');
-  const titleEl = document.getElementById('title');
-  const bgColorInput = document.getElementById('bgColor');
-  const accentColorInput = document.getElementById('accentColor');
-  const textColorInput = document.getElementById('textColor');
-  const saveSettingsBtn = document.getElementById('saveSettings');
-  const downloadCSVBtn = document.getElementById('downloadCSV');
-  const embedCodeBtn = document.getElementById('embedCode');
-  const usePhrasesCheckbox = document.getElementById('usePhrases');
-  const removeStopwordsCheckbox = document.getElementById('removeStopwords');
 
-  // local state
-  let responses = []; // raw texts
-  let settings = {
-    logoUrl: '',
-    bgColor: getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#ffffff',
-    accent: getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#2b6cb0',
-    text: getComputedStyle(document.documentElement).getPropertyValue('--text') || '#111111',
-    usePhrases: false,
-    removeStopwords: true
-  };
-
-  // Save/Load settings to localStorage so organizer doesn't need to edit code
-  function loadSettings(){
-    const s = localStorage.getItem('ww_settings');
-    if(s) settings = Object.assign(settings, JSON.parse(s));
-    // apply
-    if(settings.logoUrl) { logoImg.src = settings.logoUrl; logoImg.style.display = ''; logoUrlInput.value = settings.logoUrl; }
-    document.documentElement.style.setProperty('--bg', settings.bgColor || '#fff');
-    document.documentElement.style.setProperty('--accent', settings.accent || '#2b6cb0');
-    document.documentElement.style.setProperty('--text', settings.text || '#111');
-    bgColorInput.value = settings.bgColor || '#ffffff';
-    accentColorInput.value = settings.accent || '#2b6cb0';
-    textColorInput.value = settings.text || '#111111';
-    usePhrasesCheckbox.checked = !!settings.usePhrases;
-    removeStopwordsCheckbox.checked = settings.removeStopwords;
-  }
-  function saveSettings(){
-    settings.logoUrl = logoUrlInput.value.trim();
-    settings.bgColor = bgColorInput.value;
-    settings.accent = accentColorInput.value;
-    settings.text = textColorInput.value;
-    settings.usePhrases = usePhrasesCheckbox.checked;
-    settings.removeStopwords = removeStopwordsCheckbox.checked;
-    localStorage.setItem('ww_settings', JSON.stringify(settings));
-    // apply live
-    if(settings.logoUrl){ logoImg.src = settings.logoUrl; logoImg.style.display = ''; } else { logoImg.style.display = 'none'; }
-    document.documentElement.style.setProperty('--bg', settings.bgColor);
-    document.documentElement.style.setProperty('--accent', settings.accent);
-    document.documentElement.style.setProperty('--text', settings.text);
-    status.textContent = 'Einstellungen übernommen.';
-    setTimeout(()=>status.textContent = '', 2000);
-    renderCloud(); // apply color changes
-  }
-
-  saveSettingsBtn.addEventListener('click', saveSettings);
-
-  // simple stopwords (de + en) - erweiterbar
-  const STOPWORDS = new Set([
-    "und","oder","der","die","das","ein","eine","ich","zu","in","den","von","mit","ist","im","auf",
-    "the","and","a","to","of","in","is","it","for","on","that","this","i","you"
-  ]);
-
-  // helper: split into words (unicode aware) OR treat whole response as one token
-  function tokenize(text){
-    if(settings.usePhrases) {
-      const s = text.trim();
-      return s ? [s] : [];
-    }
-    // extract letter groups (unicode) - modern browsers support \p{L}
-    let arr = [];
+  sendBtn.addEventListener('click', async ()=>{
+    const text = respText.value.trim();
+    if(!text){ status.textContent = 'Bitte etwas eingeben.'; return; }
     try {
-      arr = text.toLowerCase().match(/\p{L}+/gu) || [];
-    } catch(e){
-      // fallback (ASCII + some accented)
-      arr = text.toLowerCase().match(/[A-Za-zÀ-ÖØ-öø-ÿÄÖÜäöüß]+/g) || [];
-    }
-    // filter short words
-    arr = arr.filter(w => w.length >= 2);
-    if(settings.removeStopwords){
-      arr = arr.filter(w => !STOPWORDS.has(w));
-    }
-    return arr;
-  }
-
-  // compute counts and render tag cloud (ensures ALL items shown)
-  function renderCloud(){
-    // compute counts
-    const map = new Map();
-    responses.forEach(txt => {
-      const toks = tokenize(txt);
-      toks.forEach(t=>{
-        const key = t.trim();
-        if(!key) return;
-        map.set(key, (map.get(key)||0)+1);
-      });
-    });
-    // turn into array
-    const items = Array.from(map.entries()).sort((a,b)=>b[1]-a[1]); // descending
-    // compute min/max
-    const counts = items.map(i=>i[1]);
-    const minC = counts.length ? Math.min(...counts) : 0;
-    const maxC = counts.length ? Math.max(...counts) : 1;
-    const minFont = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--min-font')) || 14;
-    const maxFont = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-font')) || 72;
-
-    // clear
-    wordCloud.innerHTML = '';
-
-    // show empty state
-    if(items.length === 0){
-      wordCloud.innerHTML = '<div class="small">Noch keine Antworten — sei der Erste!</div>';
-      return;
-    }
-
-    // choose color scheme: accent or gradient
-    const accent = settings.accent || getComputedStyle(document.documentElement).getPropertyValue('--accent');
-    const textColor = settings.text || getComputedStyle(document.documentElement).getPropertyValue('--text');
-
-    items.forEach(([word, count], idx) => {
-      const el = document.createElement('span');
-      el.className = 'tag';
-      // scaler
-      const size = (maxC === minC) ? (minFont + (maxFont-minFont)/2)
-        : Math.round(minFont + (count - minC) / (maxC - minC) * (maxFont - minFont));
-      el.style.fontSize = size + 'px';
-      // font weight proportional
-      const weight = Math.round(300 + (count - minC)/(maxC - minC+0.0001)*600);
-      el.style.fontWeight = weight;
-      // color: alternate subtle hues
-      if(idx % 7 === 0) el.style.color = accent;
-      else if(idx % 5 === 0) el.style.color = lightenColor(accent, 18);
-      else el.style.color = textColor;
-      el.textContent = word + ' ';
-      el.title = `${count} ×`;
-      wordCloud.appendChild(el);
-    });
-  }
-
-  // tiny color adjuster
-  function lightenColor(hex, percent) {
-    try {
-      hex = hex.replace('#','');
-      const num = parseInt(hex,16);
-      let r = (num >> 16) + percent;
-      let g = (num >> 8 & 0x00FF) + percent;
-      let b = (num & 0x0000FF) + percent;
-      r = Math.min(255, Math.max(0, r));
-      g = Math.min(255, Math.max(0, g));
-      b = Math.min(255, Math.max(0, b));
-      return '#' + ( (1<<24) + (r<<16) + (g<<8) + b ).toString(16).slice(1);
-    } catch(e){
-      return hex;
-    }
-  }
-
-  // CSV download
-  downloadCSVBtn.addEventListener('click', ()=>{
-    if(responses.length === 0){ alert('Noch keine Antworten.'); return; }
-    let csv = 'antwort;timestamp\n';
-    responses.forEach(r => {
-      const t = r.replace(/"/g, '""');
-      csv += `"${t}";\n`;
-    });
-    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'antworten.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // embed code (einfacher iframe)
-  embedCodeBtn.addEventListener('click', ()=>{
-    const site = location.origin + location.pathname.replace(/\/[^\/]*$/, '/') + 'index.html';
-    const code = `<iframe src="${site}" width="800" height="600" style="border:0;"></iframe>`;
-    prompt('Embed-Code (kopieren):', code);
-  });
-
-  // form submit
-  respForm.addEventListener('submit', async (ev)=>{
-    ev.preventDefault();
-    const txt = respText.value.trim();
-    if(!txt){ status.textContent = 'Bitte eine Antwort eingeben.'; return; }
-    try {
-      status.textContent = 'Sende...';
-      // create doc
-      await addDoc(collection(db, 'responses'), {
-        text: txt,
-        ts: serverTimestamp()
-      });
+      await addDoc(collection(db,'responses'),{text, ts:serverTimestamp()});
       respText.value = '';
-      status.textContent = 'Danke! Antwort gesendet.';
-      setTimeout(()=>status.textContent = '', 2000);
-    } catch(err){
-      console.error(err);
-      status.textContent = 'Fehler beim Senden: ' + (err.message || err);
-    }
+      status.textContent = 'Danke! Dein Wort wurde gesendet.';
+      setTimeout(()=>status.textContent='',2000);
+    } catch(err){ console.error(err); status.textContent='Fehler beim Senden'; }
   });
-
-  // Authentication: sign in anonymously
-  signInAnonymously(auth).catch(err=>{
-    console.warn('Anon sign-in failed:', err);
-  });
-
-  // load settings
-  loadSettings();
-
-  // realtime listener -> alle Antworten beobachten
-  const col = collection(db, 'responses');
-  const q = query(col, orderBy('ts', 'asc'));
-  onSnapshot(q, snap => {
-    // rebuild responses array from docs
-    responses = snap.docs.map(d => (d.data().text || '').toString());
-    renderCloud();
-  }, err => {
-    console.error('Snapshot error', err);
-    status.textContent = 'Fehler beim Laden der Antworten (Console prüfen).';
-  });
-
-  // fallback: bei erstmaligem Laden evtl. existierende docs einmal holen (onSnapshot liefert ohnehin)
-  // -- keine zusätzliche Logik notwendig.
-
-  // helper: update logo field live
-  logoUrlInput.addEventListener('change', ()=>{ saveSettingsBtn.click(); });
-
-  // apply initial CSS variables
-  document.documentElement.style.setProperty('--bg', settings.bgColor);
-  document.documentElement.style.setProperty('--accent', settings.accent);
-  document.documentElement.style.setProperty('--text', settings.text);
-
-  // initial render (falls leer)
-  renderCloud();
-
 </script>
 </body>
 </html>
