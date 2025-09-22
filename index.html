@@ -10,20 +10,27 @@
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;  /* Logo oben, Card darunter */
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: white; /* Hintergrund um die Karte herum weiß */
+    min-height: 100vh;
+    background: white;
+  }
+
+  .logo {
+    max-width: 300px;
+    width: 80%;
+    margin-bottom: 20px;
   }
 
   .card-wrapper {
     background: #F0D722; /* gelber Rahmen */
-    padding: 8px;         /* Breite des Rahmens */
+    padding: 8px;
     border-radius: 16px;
   }
 
   .card {
-    background: white;               /* weißer Hintergrund der Card */
+    background: white;
     width: 90%;
     max-width: 400px;
     border-radius: 12px;
@@ -73,7 +80,6 @@
     font-size: 0.9rem;
   }
 
-  /* Responsive: Card in kleinerem Viewport etwas schmaler */
   @media (max-width: 420px) {
     .card {
       padding: 20px 15px;
@@ -82,6 +88,11 @@
 </style>
 </head>
 <body>
+
+<!-- Logo oben -->
+<img src="/mnt/data/d563aacb-97d6-4809-a969-fdef4a375f27.png" alt="BVG Projekt Logo" class="logo">
+
+<!-- Gelb umrahmte Card -->
 <div class="card-wrapper">
   <div class="card">
     <h2>Was bedeutet für Sie partnerschaftliches Bauen?</h2>
