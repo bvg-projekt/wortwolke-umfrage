@@ -13,27 +13,26 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #F0D722;
+    background: #F0D722; /* Hintergrund außen gelb */
   }
 
   .card {
     background: white;               /* weißer Hintergrund */
     width: 90%;
     max-width: 400px;
-    height: 300px;                   /* Höhe festlegen */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border: 4px solid #F0D722;      /* gelber Rahmen */
+    padding: 30px 25px;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;         /* vertikal zentrieren */
-    align-items: center;             /* horizontal zentrieren */
-    padding: 20px;
-    text-align: center;
+    justify-content: center;         /* vertikal zentriert */
+    align-items: center;             /* horizontal zentriert */
   }
 
   .card h2 {
-    background: none;                /* kein Hintergrund mehr */
+    background: #F0D722;
     color: black;
     padding: 12px;
     border-radius: 8px;
@@ -54,3 +53,63 @@
   }
 
   button {
+    background: #F0D722;
+    color: black;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  #status {
+    margin-top: 10px;
+    color: #2f855a;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Was bedeutet für Sie partnerschaftliches Bauen?</h2>
+  <textarea id="respText" placeholder="Hier Antwort eingeben"></textarea>
+  <button id="sendBtn">Absenden</button>
+  <div id="status"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const firebaseConfig = /* TODO: DEINE FIREBASE CONFIG */ {};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  signInAnonymously(auth).catch(console.error);
+
+  const sendBtn = document.getElementById('sendBtn');
+  const respText = document.getElementById('respText');
+  const status = document.getElementById('status');
+
+  sendBtn.addEventListener('click', async ()=>{
+    const text = respText.value.trim();
+    if(!text){ 
+      status.textContent = 'Bitte etwas eingeben.'; 
+      return; 
+    }
+    try {
+      await addDoc(collection(db,'responses'), { text, ts: serverTimestamp() });
+      respText.value = '';
+      status.textContent = 'Danke! Dein Wort wurde gesendet.';
+      setTimeout(()=>status.textContent='',2000);
+    } catch(err){ 
+      console.error(err); 
+      status.textContent='Fehler beim Senden'; 
+    }
+  });
+</script>
+</body>
+</html>
