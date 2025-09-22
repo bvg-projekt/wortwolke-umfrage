@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>QR-Code zur Umfrage</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #qrcode {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scanne den QR-Code für die Umfrage</h1>
+  <div id="qrcode"></div>
+
+  <!-- QRCode.js Bibliothek laden -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    // URL deiner Umfrage (index.html auf GitHub Pages)
+    const url = "https://bvg-projekt.github.io/wortwolke-umfrage/";
+
+    // QR-Code generieren
+    new QRCode(document.getElementById("qrcode"), {
+      text: url,
+      width: 256,
+      height: 256
+    });
+  </script>
+</body>
+</html>
