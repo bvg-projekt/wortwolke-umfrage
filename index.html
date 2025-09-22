@@ -13,22 +13,27 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #F0D722; /* Hintergrund außen gelb */
+    background: white; /* Hintergrund um die Karte herum weiß */
+  }
+
+  .card-wrapper {
+    background: #F0D722; /* gelber Rahmen */
+    padding: 8px;         /* Breite des Rahmens */
+    border-radius: 16px;
   }
 
   .card {
-    background: white;               /* weißer Hintergrund */
+    background: white;               /* weißer Hintergrund der Card */
     width: 90%;
     max-width: 400px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 4px solid #F0D722;      /* gelber Rahmen */
     padding: 30px 25px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;         /* vertikal zentriert */
-    align-items: center;             /* horizontal zentriert */
+    justify-content: center;
+    align-items: center;
   }
 
   .card h2 {
@@ -43,7 +48,7 @@
 
   textarea {
     width: 100%;
-    height: 100px;
+    min-height: 100px;
     padding: 10px;
     margin-bottom: 16px;
     border-radius: 8px;
@@ -67,14 +72,23 @@
     color: #2f855a;
     font-size: 0.9rem;
   }
+
+  /* Responsive: Card in kleinerem Viewport etwas schmaler */
+  @media (max-width: 420px) {
+    .card {
+      padding: 20px 15px;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>Was bedeutet für Sie partnerschaftliches Bauen?</h2>
-  <textarea id="respText" placeholder="Hier Antwort eingeben"></textarea>
-  <button id="sendBtn">Absenden</button>
-  <div id="status"></div>
+<div class="card-wrapper">
+  <div class="card">
+    <h2>Was bedeutet für Sie partnerschaftliches Bauen?</h2>
+    <textarea id="respText" placeholder="Hier Antwort eingeben"></textarea>
+    <button id="sendBtn">Absenden</button>
+    <div id="status"></div>
+  </div>
 </div>
 
 <script type="module">
