@@ -18,11 +18,16 @@
 
   .card {
     background: white;
-    padding: 30px 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     width: 90%;
     max-width: 400px;
+    height: 300px; /* Höhe festlegen */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertikal zentrieren */
+    align-items: center;     /* horizontal zentrieren */
+    padding: 20px;
     text-align: center;
   }
 
@@ -33,6 +38,7 @@
     border-radius: 8px;
     font-size: 1.2rem;
     margin-bottom: 20px;
+    width: 100%;
   }
 
   textarea {
@@ -67,7 +73,6 @@
 <div class="card">
   <h2>Was bedeutet für Sie partnerschaftliches Bauen?</h2>
   <textarea id="respText" placeholder="Hier Antwort eingeben"></textarea>
-  <br>
   <button id="sendBtn">Absenden</button>
   <div id="status"></div>
 </div>
